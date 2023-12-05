@@ -61,6 +61,12 @@ option(SPIRV_CROSS_WERROR "Fail build on warnings." OFF)
 option(SPIRV_CROSS_MISC_WARNINGS "Misc warnings useful for Travis runs." OFF)
 
 option(SPIRV_CROSS_FORCE_PIC "Force position-independent code for all targets." OFF)
+option(SPIRV_CROSS_ENABLE_WEBMIN "Reduces SPIRV-Cross to minimum needed for web use" OFF)
+
+CMAKE_DEPENDENT_OPTION(SPIRV_CROSS_ENABLE_WEBMIN_DEVEL
+    "For SPIRV_CROSS_ENABLE_WEBMIN builds, enables compilation error messages"
+    OFF "SPIRV_CROSS_ENABLE_WEBMIN"
+    OFF)
 
 if(${CMAKE_GENERATOR} MATCHES "Makefile")
 	if(${CMAKE_CURRENT_SOURCE_DIR} STREQUAL ${CMAKE_CURRENT_BINARY_DIR})
@@ -70,7 +76,15 @@ endif()
 
 set(spirv-compiler-options "")
 set(spirv-compiler-defines "")
+set(spirv-public-compiler-defines "")
 set(spirv-cross-link-flags "")
+
+if(SPIRV_CROSS_ENABLE_WEBMIN)
+    set(spirv-public-compiler-defines "-DSPIRV_CROSS_WEBMIN")
+    if(SPIRV_CROSS_ENABLE_WEBMIN_DEVEL)
+        set(spirv-public-compiler-defines "-DSPIRV_CROSS_WEBMIN_DEVEL")
+    endif()
+endif()
 
 message(STATUS "SPIRV-Cross: Finding Git version for SPIRV-Cross.")
 set(spirv-cross-build-version "unknown")
@@ -177,6 +191,7 @@ macro(spirv_cross_add_library name config_name library_type)
 	endif()
 	target_compile_options(${name} PRIVATE ${spirv-compiler-options})
 	target_compile_definitions(${name} PRIVATE ${spirv-compiler-defines})
+	target_compile_definitions(${name} PUBLIC ${spirv-public-compiler-defines})
 	if (SPIRV_CROSS_NAMESPACE_OVERRIDE)
 		if (${library_type} MATCHES "STATIC")
 			target_compile_definitions(${name} PUBLIC SPIRV_CROSS_NAMESPACE_OVERRIDE=${SPIRV_CROSS_NAMESPACE_OVERRIDE})
@@ -287,21 +302,15 @@ if (SPIRV_CROSS_STATIC)
 	if (SPIRV_CROSS_ENABLE_MSL)
 		spirv_cross_add_library(spirv-cross-msl spirv_cross_msl STATIC
 				${spirv-cross-msl-sources})
-		if (SPIRV_CROSS_ENABLE_GLSL)
-			target_link_libraries(spirv-cross-msl PRIVATE spirv-cross-glsl)
-		else()
-			message(FATAL_ERROR "Must enable GLSL support to enable MSL support.")
-		endif()
+
+		target_link_libraries(spirv-cross-msl PRIVATE spirv-cross-core)
 	endif()
 
 	if (SPIRV_CROSS_ENABLE_HLSL)
 		spirv_cross_add_library(spirv-cross-hlsl spirv_cross_hlsl STATIC
 				${spirv-cross-hlsl-sources})
-		if (SPIRV_CROSS_ENABLE_GLSL)
-			target_link_libraries(spirv-cross-hlsl PRIVATE spirv-cross-glsl)
-		else()
-			message(FATAL_ERROR "Must enable GLSL support to enable HLSL support.")
-		endif()
+
+		target_link_libraries(spirv-cross-hlsl PRIVATE spirv-cross-core)
 	endif()
 
 	if (SPIRV_CROSS_ENABLE_UTIL)

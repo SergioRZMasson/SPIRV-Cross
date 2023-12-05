@@ -68,7 +68,15 @@ public:
 	}
 };
 
+#ifdef SPIRV_CROSS_WEBMIN
+#ifdef SPIRV_CROSS_WEBMIN_DEVEL
 #define SPIRV_CROSS_THROW(x) throw CompilerError(x)
+#else
+#define SPIRV_CROSS_THROW(x) throw CompilerError("")
+#endif
+#else
+#define SPIRV_CROSS_THROW(x) throw CompilerError(x)
+#endif
 #endif
 
 // MSVC 2013 does not have noexcept. We need this for Variant to get move constructor to work correctly
