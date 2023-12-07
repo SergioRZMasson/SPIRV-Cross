@@ -10264,7 +10264,7 @@ string CompilerHLSL::convert_float_to_string(const SPIRConstant &c, uint32_t col
 
 			char print_buffer[32];
 #ifdef _WIN32
-			sprintf(print_buffer, "0x%xu", c.scalar(col, row));
+			sprintf_s(print_buffer, "0x%xu", c.scalar(col, row));
 #else
 			snprintf(print_buffer, sizeof(print_buffer), "0x%xu", c.scalar(col, row));
 #endif
