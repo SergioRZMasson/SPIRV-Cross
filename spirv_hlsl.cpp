@@ -4845,7 +4845,6 @@ void CompilerHLSL::emit_instruction(const Instruction &instruction)
 
 	case OpIEqual:
 	{
-#ifndef SPIRV_CROSS_WEBMIN
 		auto result_type = ops[0];
 		auto id = ops[1];
 
@@ -4853,9 +4852,7 @@ void CompilerHLSL::emit_instruction(const Instruction &instruction)
 			emit_unrolled_binary_op(result_type, id, ops[2], ops[3], "==", false, SPIRType::Unknown);
 		else
 			HLSL_BOP_CAST(==, int_type);
-#else
-		SPIRV_CROSS_INVALID_CALL();
-#endif
+
 		break;
 	}
 
@@ -4881,7 +4878,6 @@ void CompilerHLSL::emit_instruction(const Instruction &instruction)
 
 	case OpINotEqual:
 	{
-#ifndef SPIRV_CROSS_WEBMIN
 		auto result_type = ops[0];
 		auto id = ops[1];
 
@@ -4889,9 +4885,7 @@ void CompilerHLSL::emit_instruction(const Instruction &instruction)
 			emit_unrolled_binary_op(result_type, id, ops[2], ops[3], "!=", false, SPIRType::Unknown);
 		else
 			HLSL_BOP_CAST(!=, int_type);
-#else
-		SPIRV_CROSS_INVALID_CALL();
-#endif
+
 		break;
 	}
 
@@ -4899,7 +4893,6 @@ void CompilerHLSL::emit_instruction(const Instruction &instruction)
 	case OpFOrdNotEqual:
 	case OpFUnordNotEqual:
 	{
-#ifndef SPIRV_CROSS_WEBMIN
 		// HLSL != operator is unordered.
 		// https://docs.microsoft.com/en-us/windows/win32/direct3d10/d3d10-graphics-programming-guide-resources-float-rules.
 		// isnan() is apparently implemented as x != x as well.
@@ -4917,16 +4910,13 @@ void CompilerHLSL::emit_instruction(const Instruction &instruction)
 			emit_unrolled_binary_op(result_type, id, ops[2], ops[3], "!=", false, SPIRType::Unknown);
 		else
 			HLSL_BOP(!=);
-#else
-		SPIRV_CROSS_INVALID_CALL();
-#endif
+
 		break;
 	}
 
 	case OpUGreaterThan:
 	case OpSGreaterThan:
 	{
-#ifndef SPIRV_CROSS_WEBMIN
 		auto result_type = ops[0];
 		auto id = ops[1];
 		auto type = opcode == OpUGreaterThan ? uint_type : int_type;
@@ -4935,9 +4925,7 @@ void CompilerHLSL::emit_instruction(const Instruction &instruction)
 			emit_unrolled_binary_op(result_type, id, ops[2], ops[3], ">", false, type);
 		else
 			HLSL_BOP_CAST(>, type);
-#else
-		SPIRV_CROSS_INVALID_CALL();
-#endif
+
 		break;
 	}
 
@@ -4955,7 +4943,6 @@ void CompilerHLSL::emit_instruction(const Instruction &instruction)
 
 	case OpFUnordGreaterThan:
 	{
-#ifndef SPIRV_CROSS_WEBMIN
 		auto result_type = ops[0];
 		auto id = ops[1];
 
@@ -4963,16 +4950,13 @@ void CompilerHLSL::emit_instruction(const Instruction &instruction)
 			emit_unrolled_binary_op(result_type, id, ops[2], ops[3], "<=", true, SPIRType::Unknown);
 		else
 			CompilerGLSL_emit_instruction(instruction);
-#else
-		SPIRV_CROSS_INVALID_CALL();
-#endif
+
 		break;
 	}
 
 	case OpUGreaterThanEqual:
 	case OpSGreaterThanEqual:
 	{
-#ifndef SPIRV_CROSS_WEBMIN
 		auto result_type = ops[0];
 		auto id = ops[1];
 
@@ -4981,9 +4965,7 @@ void CompilerHLSL::emit_instruction(const Instruction &instruction)
 			emit_unrolled_binary_op(result_type, id, ops[2], ops[3], ">=", false, type);
 		else
 			HLSL_BOP_CAST(>=, type);
-#else
-		SPIRV_CROSS_INVALID_CALL();
-#endif
+
 		break;
 	}
 
@@ -5001,7 +4983,6 @@ void CompilerHLSL::emit_instruction(const Instruction &instruction)
 
 	case OpFUnordGreaterThanEqual:
 	{
-#ifndef SPIRV_CROSS_WEBMIN
 		auto result_type = ops[0];
 		auto id = ops[1];
 
@@ -5009,16 +4990,13 @@ void CompilerHLSL::emit_instruction(const Instruction &instruction)
 			emit_unrolled_binary_op(result_type, id, ops[2], ops[3], "<", true, SPIRType::Unknown);
 		else
 			CompilerGLSL_emit_instruction(instruction);
-#else
-		SPIRV_CROSS_INVALID_CALL();
-#endif
+
 		break;
 	}
 
 	case OpULessThan:
 	case OpSLessThan:
 	{
-#ifndef SPIRV_CROSS_WEBMIN
 		auto result_type = ops[0];
 		auto id = ops[1];
 
@@ -5027,9 +5005,7 @@ void CompilerHLSL::emit_instruction(const Instruction &instruction)
 			emit_unrolled_binary_op(result_type, id, ops[2], ops[3], "<", false, type);
 		else
 			HLSL_BOP_CAST(<, type);
-#else
-		SPIRV_CROSS_INVALID_CALL();
-#endif
+
 		break;
 	}
 
@@ -5047,7 +5023,6 @@ void CompilerHLSL::emit_instruction(const Instruction &instruction)
 
 	case OpFUnordLessThan:
 	{
-#ifndef SPIRV_CROSS_WEBMIN
 		auto result_type = ops[0];
 		auto id = ops[1];
 
@@ -5055,9 +5030,7 @@ void CompilerHLSL::emit_instruction(const Instruction &instruction)
 			emit_unrolled_binary_op(result_type, id, ops[2], ops[3], ">=", true, SPIRType::Unknown);
 		else
 			CompilerGLSL_emit_instruction(instruction);
-#else
-		SPIRV_CROSS_INVALID_CALL();
-#endif
+
 		break;
 	}
 
@@ -5077,7 +5050,6 @@ void CompilerHLSL::emit_instruction(const Instruction &instruction)
 
 	case OpFOrdLessThanEqual:
 	{
-#ifndef SPIRV_CROSS_WEBMIN
 		auto result_type = ops[0];
 		auto id = ops[1];
 
@@ -5085,15 +5057,11 @@ void CompilerHLSL::emit_instruction(const Instruction &instruction)
 			emit_unrolled_binary_op(result_type, id, ops[2], ops[3], "<=", false, SPIRType::Unknown);
 		else
 			HLSL_BOP(<=);
-#else
-		SPIRV_CROSS_INVALID_CALL();
-#endif
 		break;
 	}
 
 	case OpFUnordLessThanEqual:
 	{
-#ifndef SPIRV_CROSS_WEBMIN
 		auto result_type = ops[0];
 		auto id = ops[1];
 
@@ -5101,9 +5069,7 @@ void CompilerHLSL::emit_instruction(const Instruction &instruction)
 			emit_unrolled_binary_op(result_type, id, ops[2], ops[3], ">", true, SPIRType::Unknown);
 		else
 			CompilerGLSL_emit_instruction(instruction);
-#else
-		SPIRV_CROSS_INVALID_CALL();
-#endif
+
 		break;
 	}
 
