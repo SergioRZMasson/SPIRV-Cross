@@ -16169,6 +16169,44 @@ bool CompilerHLSL::should_suppress_usage_tracking(uint32_t id) const
 	return !expression_is_forwarded(id) || expression_suppresses_usage_tracking(id);
 }
 
+string CompilerHLSL::to_extract_constant_composite_expression(uint32_t result_type, const SPIRConstant &c,
+	const uint32_t *chain, uint32_t length)
+{
+// It is kinda silly if application actually enter this path since they know the constant up front.
+// It is useful here to extract the plain constant directly.
+SPIRConstant tmp;
+tmp.constant_type = result_type;
+auto &composite_type = get<SPIRType>(c.constant_type);
+assert(composite_type.basetype != SPIRType::Struct && composite_type.array.empty());
+assert(!c.specialization);
+
+if (is_matrix(composite_type))
+{
+if (length == 2)
+{
+tmp.m.c[0].vecsize = 1;
+tmp.m.columns = 1;
+tmp.m.c[0].r[0] = c.m.c[chain[0]].r[chain[1]];
+}
+else
+{
+assert(length == 1);
+tmp.m.c[0].vecsize = composite_type.vecsize;
+tmp.m.columns = 1;
+tmp.m.c[0] = c.m.c[chain[0]];
+}
+}
+else
+{
+assert(length == 1);
+tmp.m.c[0].vecsize = 1;
+tmp.m.columns = 1;
+tmp.m.c[0].r[0] = c.m.c[0].r[chain[0]];
+}
+
+return constant_expression(tmp);
+}
+
 #ifndef SPIRV_CROSS_WEBMIN
 CompilerHLSL::ShaderSubgroupSupportHelper::Result::Result()
 {
@@ -19663,44 +19701,6 @@ string CompilerHLSL::to_rerolled_array_expression(const SPIRType &parent_type,
 	return expr;
 }
 
-string CompilerHLSL::to_extract_constant_composite_expression(uint32_t result_type, const SPIRConstant &c,
-                                                              const uint32_t *chain, uint32_t length)
-{
-	// It is kinda silly if application actually enter this path since they know the constant up front.
-	// It is useful here to extract the plain constant directly.
-	SPIRConstant tmp;
-	tmp.constant_type = result_type;
-	auto &composite_type = get<SPIRType>(c.constant_type);
-	assert(composite_type.basetype != SPIRType::Struct && composite_type.array.empty());
-	assert(!c.specialization);
-
-	if (is_matrix(composite_type))
-	{
-		if (length == 2)
-		{
-			tmp.m.c[0].vecsize = 1;
-			tmp.m.columns = 1;
-			tmp.m.c[0].r[0] = c.m.c[chain[0]].r[chain[1]];
-		}
-		else
-		{
-			assert(length == 1);
-			tmp.m.c[0].vecsize = composite_type.vecsize;
-			tmp.m.columns = 1;
-			tmp.m.c[0] = c.m.c[chain[0]];
-		}
-	}
-	else
-	{
-		assert(length == 1);
-		tmp.m.c[0].vecsize = 1;
-		tmp.m.columns = 1;
-		tmp.m.c[0].r[0] = c.m.c[0].r[chain[0]];
-	}
-
-	return constant_expression(tmp);
-}
-
 void CompilerHLSL::emit_copy_logical_type(uint32_t lhs_id, uint32_t lhs_type_id, uint32_t rhs_id, uint32_t rhs_type_id,
                                           SmallVector<uint32_t> chain)
 {
@@ -20865,13 +20865,6 @@ void CompilerHLSL::disallow_forwarding_in_expression_chain(const SPIRExpression 
 
 string CompilerHLSL::to_rerolled_array_expression(const SPIRType &,
                                                   const string &, const SPIRType &)
-{
-	SPIRV_CROSS_INVALID_CALL();
-	SPIRV_CROSS_THROW("Invalid call.");
-}
-
-string CompilerHLSL::to_extract_constant_composite_expression(uint32_t, const SPIRConstant &,
-                                                              const uint32_t *, uint32_t)
 {
 	SPIRV_CROSS_INVALID_CALL();
 	SPIRV_CROSS_THROW("Invalid call.");
